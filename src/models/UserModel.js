@@ -1,6 +1,5 @@
 const connectDB = require("./../database/config");
 const lodash = require("lodash");
-const { reject, result } = require("lodash");
 
 const TABLE_NAME = "users";
 
@@ -42,10 +41,10 @@ class UserModel {
 		});
 	}
 
-	login(email, token) {
+	login(email, password) {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM ${TABLE_NAME} WHERE email = ? AND token = ? `;
-			const values = [email, token];
+			const sql = `SELECT * FROM ${TABLE_NAME} WHERE email = ? AND password = ? `;
+			const values = [email, password];
 			try {
 				connectDB.query(sql, values, (err, results) => {
 					resolve({ results });
@@ -65,7 +64,7 @@ class UserModel {
 			const values = [
 				user.name,
 				user.email,
-				user.token,
+				user.password,
 				user.image ? user.image : null,
 				user.phone ? user.phone : null,
 				user.birtday ? user.birtday : null,
