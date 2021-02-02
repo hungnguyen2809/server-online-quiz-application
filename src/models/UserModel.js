@@ -32,6 +32,7 @@ class UserModel {
 					if (lodash.isEmpty(results)) {
 						resolve({ results: false });
 					} else {
+						// console.log(results[0]);
 						resolve({ results });
 					}
 				});

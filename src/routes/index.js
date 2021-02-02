@@ -11,7 +11,7 @@ routes.post("/userlogin", AuthController.login);
 routes.post("/userregister", AuthController.register);
 
 // User
-routes.get("/users/:id", verifyToken, UserController.find);
+routes.get("/users", verifyToken, UserController.find);
 routes.put("/users", verifyToken, UserController.updateInfo);
 
 module.exports = routes;

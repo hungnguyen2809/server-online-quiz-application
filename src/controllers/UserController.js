@@ -10,8 +10,8 @@ class UserController {
 
 	find = async (req, res) => {
 		try {
-			const params = req.params;
-			const user = await UserModel.find(params.id);
+			const query = req.query;
+			const user = await UserModel.find(query.id);
 			if (!user.results) {
 				res.statusCode = 404;
 				let mes = "User not found";
