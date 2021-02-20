@@ -1,6 +1,7 @@
 const express = require("express");
 const routes = express.Router();
 const verifyToken = require("./../controllers/middlewares/verifyToken");
+const uploadImg = require("./../controllers/middlewares/uploadImage");
 
 const UserController = require("./../controllers/UserController");
 const AuthController = require("./../controllers/AuthController");
@@ -12,6 +13,11 @@ routes.post("/userregister", AuthController.register);
 
 // User
 routes.get("/users", verifyToken, UserController.find);
-routes.put("/users", verifyToken, UserController.updateInfo);
+routes.post("/users-infor", verifyToken, UserController.updateInfo);
+routes.post(
+	"/users-avatar",
+	[verifyToken, uploadImg],
+	UserController.updateAvatar
+);
 
 module.exports = routes;

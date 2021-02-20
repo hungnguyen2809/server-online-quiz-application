@@ -59,3 +59,6 @@ buck-out/
 
 # dotenv
 .env
+
+#public/images
+public/images

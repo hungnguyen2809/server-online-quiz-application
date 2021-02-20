@@ -1,9 +1,8 @@
 const UserModel = require("./../models/UserModel");
 const resultServe = require("./../common/resultServe");
 const format = require("./../common/formatDate");
-
-// insert ngày vào thì ngày trừ đi 1 => lấy ra phải cộng thêm 1
-// insert theo định dạng năm-tháng-ngày
+const configPath = require("./../common/configPathImage");
+const { toNumber } = require("lodash");
 
 class UserController {
 	constructor() {}
@@ -11,14 +10,19 @@ class UserController {
 	find = async (req, res) => {
 		try {
 			const query = req.query;
-			const user = await UserModel.find(query.id);
-			if (!user.results) {
+			const userFinding = await UserModel.find(query.id);
+			if (!userFinding.results) {
 				res.statusCode = 404;
 				let mes = "User not found";
 				return res.send(resultServe.error(mes));
 			}
 
-			return res.send(resultServe.success("Success", user.results[0]));
+			let user = userFinding.results[0];
+			if (user.image) {
+				user.image = configPath(user.image);
+			}
+
+			return res.send(resultServe.success("Success", user));
 		} catch (error) {
 			res.statusCode = 500;
 			return res.send(resultServe.error);
@@ -37,20 +41,47 @@ class UserController {
 
 			const newUser = {
 				name: body.name ? body.name : userOld.name,
-				image: body.image ? body.image : userOld.image,
 				phone: body.phone ? body.phone : userOld.phone,
 				birtday: body.birtday
 					? format.formatDate(body.birtday)
 					: userOld.birtday,
 				address: body.address ? body.address : userOld.address,
-				id: body.id,
+				id: toNumber(body.id),
 			};
 
-			const user = await UserModel.updateInfo(newUser);
-			return res.send(resultServe.success("Updated Success", user.results[0]));
+			const userUpdating = await UserModel.updateInfo(newUser);
+			let user = userUpdating.results[0];
+			if (user.image) {
+				user.image = configPath(user.image);
+			}
+
+			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
 			res.statusCode = 500;
-			return res.send(resultServe.error);
+			return res.send(resultServe.error());
+		}
+	};
+
+	updateAvatar = async (req, res) => {
+		try {
+			if (req.file) {
+				const id = toNumber(req.body.id);
+				const image = req.file.path;
+
+				const userUpdating = await UserModel.updateAvatar(id, image);
+				let user = userUpdating.results[0];
+				if (user.image) {
+					user.image = configPath(user.image);
+				}
+
+				return res.send(resultServe.success("Updated Success", user));
+			} else {
+				res.statusCode = 500;
+				return res.send(resultServe.error("Error by file"));
+			}
+		} catch (error) {
+			res.statusCode = 500;
+			return res.send(resultServe.error());
 		}
 	};
 }

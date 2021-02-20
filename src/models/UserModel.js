@@ -93,10 +93,9 @@ class UserModel {
 
 	updateInfo(user) {
 		return new Promise((resolve, reject) => {
-			const sql = `UPDATE ${TABLE_NAME} SET name = ?, image = ?, phone = ?, birtday = ?, address = ? WHERE id = ?`;
+			const sql = `UPDATE ${TABLE_NAME} SET name = ?, phone = ?, birtday = ?, address = ? WHERE id = ?`;
 			const values = [
 				user.name,
-				user.image,
 				user.phone,
 				user.birtday,
 				user.address,
@@ -107,6 +106,26 @@ class UserModel {
 					connectDB.query(
 						`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
 						[user.id],
+						(error, results) => {
+							resolve({ results });
+						}
+					);
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	}
+
+	updateAvatar(id, image) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE ${TABLE_NAME} SET image = ? WHERE id = ?`;
+			const values = [image, id];
+			try {
+				connectDB.query(sql, values, (err, res) => {
+					connectDB.query(
+						`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
+						[id],
 						(error, results) => {
 							resolve({ results });
 						}

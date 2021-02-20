@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv");
 const UserModel = require("./../models/UserModel");
 const resultServe = require("./../common/resultServe");
+const configPath = require("../common/configPathImage");
 
 class AuthController {
 	constructor() {}
@@ -38,28 +39,35 @@ class AuthController {
 				let mes = "User not exists";
 				return res.send(resultServe.error(mes));
 			}
-			const user = await UserModel.login(email, password);
-			if (user.results.length === 0) {
+			const userLogin = await UserModel.login(email, password);
+			if (userLogin.results.length === 0) {
 				res.statusCode = 403;
 				let mes = "Incorrect account email or password";
 				return res.send(resultServe.error(mes));
 			}
-			if (user.results[0].status === 0) {
+			if (userLogin.results[0].status === 0) {
 				res.statusCode = 406;
 				let mes = "The account is locked, unavailable.";
 				return res.send(resultServe.error(mes));
 			}
 			// return res.send(resultServe.success("Success", user.results[0]));
 			const token = jwt.sign(
-				{ token: user.results[0].token },
+				{ token: userLogin.results[0].password },
 				process.env.TOKEN_SECRET,
 				{ expiresIn: 60 * 60 * 24 }
 			);
+
+			let user = {
+				...userLogin.results[0],
+				token: token,
+			};
+			if (user.image) {
+				user.image = configPath(user.image);
+			}
+
 			return res
 				.header("auth-token", token)
-				.send(
-					resultServe.success("Success", { ...user.results[0], token: token })
-				);
+				.send(resultServe.success("Success", user));
 		} catch (error) {
 			res.statusCode = 500;
 			return res.send(resultServe.error());
@@ -87,18 +95,16 @@ class AuthController {
 			res.statusCode = 201;
 			// return res.send(resultServe.success("Create Success", user.results[0]));
 			const token = jwt.sign(
-				{ token: user.results[0].token },
+				{ token: user.results[0].password },
 				process.env.TOKEN_SECRET,
 				{ expiresIn: 60 * 60 * 24 }
 			);
-			return res
-				.header("auth-token", token)
-				.send(
-					resultServe.success("Created Success", {
-						...user.results[0],
-						token: token,
-					})
-				);
+			return res.header("auth-token", token).send(
+				resultServe.success("Created Success", {
+					...user.results[0],
+					token: token,
+				})
+			);
 		} catch (error) {
 			res.statusCode = 500;
 			return res.send(resultServe.error);

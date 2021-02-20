@@ -1,8 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+require("dotenv").config();
+
 const app = express();
-const PORT = 8888;
+const PORT = process.env.SV_PORT;
+const HOST = process.env.SV_HOST;
 
 const routes = require("./src/routes/index");
 
@@ -21,6 +24,8 @@ app.use(
 	})
 );
 
+app.use("/public/images", express.static("public/images"));
+
 app.get("/", (req, res) => {
 	// res.statusCode
 	// req.params
@@ -31,5 +36,5 @@ app.get("/", (req, res) => {
 app.use("/api", routes);
 
 app.listen(PORT, () => {
-	console.log(`Server listening at http://127.0.0.1:${PORT}`);
+	console.log(`Server listening at http://${HOST}:${PORT}`);
 });
