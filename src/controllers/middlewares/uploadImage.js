@@ -29,6 +29,6 @@ const uploadImg = multer({
 		fieldSize: 1024 * 1024 * 5,
 	},
 	fileFilter: fileFilter,
-}).single("image");
+}).single("file");
 
 module.exports = uploadImg;

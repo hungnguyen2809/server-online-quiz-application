@@ -67,7 +67,7 @@ class UserController {
 			if (req.file) {
 				const id = toNumber(req.body.id);
 				const image = req.file.path;
-
+			
 				const userUpdating = await UserModel.updateAvatar(id, image);
 				let user = userUpdating.results[0];
 				if (user.image) {
