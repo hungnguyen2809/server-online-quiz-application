@@ -13,11 +13,13 @@ class AuthController {
 		try {
 			const hasEmail = await UserModel.hasEmail(email);
 			if (hasEmail.results) {
-				res.statusCode = 400;
-				let mes = "Email exists";
-				return res.send(resultServe.error(mes));
+				return res.send(
+					resultServe.success("Email exists", { exists: true, id: hasEmail.id })
+				);
 			}
-			return res.send(resultServe.success("Email availability."));
+			return res.send(
+				resultServe.success("Email availability", { exists: false, id: null })
+			);
 		} catch (error) {
 			res.statusCode = 500;
 			return res.send(resultServe.error());

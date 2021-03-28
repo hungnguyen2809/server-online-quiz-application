@@ -19,5 +19,6 @@ routes.post(
 	[verifyToken, uploadImg],
 	UserController.updateAvatar
 );
+routes.post("/foget-password", verifyToken, UserController.forgetPassword);
 
 module.exports = routes;

@@ -67,7 +67,7 @@ class UserController {
 			if (req.file) {
 				const id = toNumber(req.body.id);
 				const image = req.file.path;
-			
+
 				const userUpdating = await UserModel.updateAvatar(id, image);
 				let user = userUpdating.results[0];
 				if (user.image) {
@@ -79,6 +79,22 @@ class UserController {
 				res.statusCode = 500;
 				return res.send(resultServe.error("Error by file"));
 			}
+		} catch (error) {
+			res.statusCode = 500;
+			return res.send(resultServe.error());
+		}
+	};
+
+	forgetPassword = async (req, res) => {
+		try {
+			const { email, password } = req.body;
+			const userUpdate = await UserModel.updatePassword(email, password);
+
+			let user = userUpdate.data;
+			if (user.image) {
+				user.image = configPath(user.image);
+			}
+			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
 			res.statusCode = 500;
 			return res.send(resultServe.error());

@@ -15,7 +15,7 @@ class UserModel {
 					if (lodash.isEmpty(results)) {
 						resolve({ results: false });
 					} else {
-						resolve({ results: true });
+						resolve({ results: true, id: results[0].id });
 					}
 				});
 			} catch (error) {
@@ -128,6 +128,26 @@ class UserModel {
 						[id],
 						(error, results) => {
 							resolve({ results });
+						}
+					);
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	}
+
+	updatePassword(email, password) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE ${TABLE_NAME} SET password = ? WHERE email = ?`;
+			const values = [password, email];
+			try {
+				connectDB.query(sql, values, (err, res) => {
+					connectDB.query(
+						`SELECT * FROM ${TABLE_NAME} WHERE email = ?`,
+						[email],
+						(error, results) => {
+							resolve({ data: results[0] });
 						}
 					);
 				});
