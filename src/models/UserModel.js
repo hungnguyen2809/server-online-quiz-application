@@ -27,6 +27,7 @@ class UserModel {
 	find(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM ${TABLE_NAME} WHERE id = ?`;
+			// const sql = 'CALL TK_FIND_USER(?)';
 			try {
 				connectDB.query(sql, [id], (err, results) => {
 					if (lodash.isEmpty(results)) {

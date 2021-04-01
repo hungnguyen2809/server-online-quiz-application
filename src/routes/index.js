@@ -5,6 +5,7 @@ const uploadImg = require("./../controllers/middlewares/uploadImage");
 
 const UserController = require("./../controllers/UserController");
 const AuthController = require("./../controllers/AuthController");
+const TopicController = require("./../controllers/TopicController");
 
 // Auth
 routes.get("/hasemail", AuthController.hasEmail);
@@ -20,5 +21,10 @@ routes.post(
 	UserController.updateAvatar
 );
 routes.post("/foget-password", verifyToken, UserController.forgetPassword);
+
+//Topics
+routes.post("/topics", TopicController.createNewTopic);
+routes.get("/topics", TopicController.getTopics);
+routes.delete("/topics", TopicController.deleteTopic);
 
 module.exports = routes;
