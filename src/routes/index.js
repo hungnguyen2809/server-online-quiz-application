@@ -26,5 +26,6 @@ routes.post("/foget-password", verifyToken, UserController.forgetPassword);
 routes.post("/topics", TopicController.createNewTopic);
 routes.get("/topics", TopicController.getTopics);
 routes.delete("/topics", TopicController.deleteTopic);
+routes.put("/topics", TopicController.updateTopic);
 
 module.exports = routes;

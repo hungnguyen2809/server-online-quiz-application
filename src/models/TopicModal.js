@@ -67,6 +67,36 @@ class TopicModal {
 			}
 		});
 	};
+
+	updateTopic = ({ id, name, image, description, status }) => {
+		return new Promise((resolve, reject) => {
+			try {
+				const sqlUpdate = "CALL TOPIC_UPDATE(?, ?, ?, ?, ?)";
+				const values = [id, name, image, description, status];
+
+				const sqlFind = "CALL TOPIC_FIND(?)";
+				connectDB.query(sqlFind, [id], (err, res) => {
+					if (err === null) {
+						if (_.get(res[0][0], "NUMBER") > 0) {
+							connectDB.query(sqlUpdate, values, (err, res) => {
+								if (err === null) {
+									resolve({ data: res[0][0] });
+								} else {
+									reject({ error: err });
+								}
+							});
+						} else {
+							resolve({ data: false });
+						}
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject(error);
+			}
+		});
+	};
 }
 
 module.exports = new TopicModal();
