@@ -1,7 +1,7 @@
-const connectDB = require("./../database/config");
+const connectDB = require("../database/config");
 const _ = require("lodash");
 
-class TopicModal {
+class TopicModel {
 	constructor() {}
 
 	getTopics = () => {
@@ -99,4 +99,4 @@ class TopicModal {
 	};
 }
 
-module.exports = new TopicModal();
+module.exports = new TopicModel();

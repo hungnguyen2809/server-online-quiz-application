@@ -1,4 +1,4 @@
-const TopicModal = require("./../models/TopicModal");
+const TopicModel = require("../models/TopicModel");
 const resServe = require("./../common/resultServe");
 const _ = require("lodash");
 const { get } = require("lodash");
@@ -11,7 +11,7 @@ class TopicController {
 
 	getTopics = async (req, res) => {
 		try {
-			const topics = await TopicModal.getTopics();
+			const topics = await TopicModel.getTopics();
 			return res.send(resServe.success("Success", topics.data));
 		} catch (ex) {
 			if (ex.error) {
@@ -38,7 +38,7 @@ class TopicController {
 				);
 			}
 			const payload = { name, image, description };
-			const topics = await TopicModal.createTopic(payload);
+			const topics = await TopicModel.createTopic(payload);
 			return res.send(resServe.success("Success", topics.data));
 		} catch (ex) {
 			if (ex.error) {
@@ -57,7 +57,7 @@ class TopicController {
 				return res.send(resServe.error("Bad request. Validate 'id'"));
 			}
 			const payload = { id };
-			const topics = await TopicModal.deleteTopic(payload);
+			const topics = await TopicModel.deleteTopic(payload);
 
 			if (_.get(topics, "data") === false) {
 				return res.send(resServe.error("Topic not exists."));
@@ -91,7 +91,7 @@ class TopicController {
 			}
 
 			const payload = { id, name, image, description, status };
-			const topicUpdate = await TopicModal.updateTopic(payload);
+			const topicUpdate = await TopicModel.updateTopic(payload);
 
 			if (get(topicUpdate, "data") === false) {
 				return res.send(resServe.error("Topic not found"));
