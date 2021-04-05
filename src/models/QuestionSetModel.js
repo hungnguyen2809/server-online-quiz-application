@@ -1,14 +1,14 @@
 const connectDB = require("../database/config");
 const _ = require("lodash");
 
-class QuestionModal {
+class QuestionSetModel {
 	constructor() {}
 
-	getQuestionByQuestionSet = (id_qs) => {
+	getQuetionSetByTopic = (id_topic) => {
 		return new Promise((resolve, reject) => {
 			try {
-				const sql = "CALL GET_BY_QUESTION_SET(?);";
-				const values = [id_qs];
+				const sql = "CALL GET_QUESTIONSET_TOPIC(?);";
+				const values = [id_topic];
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ data: res[0] });
@@ -23,4 +23,4 @@ class QuestionModal {
 	};
 }
 
-module.exports = new QuestionModal();
+module.exports = new QuestionSetModel();
