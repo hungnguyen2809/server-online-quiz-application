@@ -1,8 +1,9 @@
 const jwt = require("jsonwebtoken");
+const { KEY_HEADER_TOKEN } = require("../../constants/KeyHeader");
 require("dotenv");
 
 const verifyToken = (request, response, next) => {
-	const token = request.header("auth-token");
+	const token = request.header(KEY_HEADER_TOKEN);
 
 	if (!token)
 		return response.status(401).send({

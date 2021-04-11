@@ -3,6 +3,8 @@ require("dotenv");
 const UserModel = require("./../models/UserModel");
 const resultServe = require("./../common/resultServe");
 const configPath = require("../common/configPathImage");
+const _ = require("lodash");
+const { KEY_HEADER_TOKEN } = require("../constants/KeyHeader");
 
 class AuthController {
 	constructor() {}
@@ -53,11 +55,17 @@ class AuthController {
 				return res.send(resultServe.error(mes));
 			}
 			// return res.send(resultServe.success("Success", user.results[0]));
-			const token = jwt.sign(
-				{ token: userLogin.results[0].password },
-				process.env.TOKEN_SECRET,
-				{ expiresIn: 60 * 60 * 24 }
-			);
+			const payload = {
+				email: _.get(userLogin.results[0], "email", ""),
+				name: _.get(userLogin.results[0], "name", ""),
+				phone: _.get(userLogin.results[0], "phone", ""),
+				address: _.get(userLogin.results[0], "address", ""),
+				admin: _.get(userLogin.results[0], "permission", 0) === 1,
+			};
+
+			const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+				expiresIn: 60 * 60 * 24,
+			});
 
 			let user = {
 				...userLogin.results[0],
@@ -68,7 +76,7 @@ class AuthController {
 			}
 
 			return res
-				.header("auth-token", token)
+				.header(KEY_HEADER_TOKEN, token)
 				.send(resultServe.success("Success", user));
 		} catch (error) {
 			res.statusCode = 500;
@@ -96,12 +104,19 @@ class AuthController {
 			const user = await UserModel.create(body);
 			res.statusCode = 201;
 			// return res.send(resultServe.success("Create Success", user.results[0]));
-			const token = jwt.sign(
-				{ token: user.results[0].password },
-				process.env.TOKEN_SECRET,
-				{ expiresIn: 60 * 60 * 24 }
-			);
-			return res.header("auth-token", token).send(
+			const payload = {
+				email: _.get(user.results[0], "email", ""),
+				name: _.get(user.results[0], "name", ""),
+				phone: _.get(user.results[0], "phone", ""),
+				address: _.get(user.results[0], "address", ""),
+				admin: _.get(user.results[0], "permission", 0) === 1,
+			};
+
+			const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+				expiresIn: 60 * 60 * 24,
+			});
+
+			return res.header(KEY_HEADER_TOKEN, token).send(
 				resultServe.success("Created Success", {
 					...user.results[0],
 					token: token,

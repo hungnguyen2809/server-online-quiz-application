@@ -13,6 +13,7 @@ const QuestionSetController = require("./../controllers/QuestionSetController");
 routes.get("/hasemail", AuthController.hasEmail);
 routes.post("/userlogin", AuthController.login);
 routes.post("/userregister", AuthController.register);
+routes.post("/foget-password", UserController.forgetPassword);
 
 // User
 routes.get("/users", verifyToken, UserController.find);
@@ -22,23 +23,24 @@ routes.post(
 	[verifyToken, uploadImg],
 	UserController.updateAvatar
 );
-routes.post("/foget-password", verifyToken, UserController.forgetPassword);
 
 //Topics
-routes.post("/topics", TopicController.createNewTopic);
-routes.get("/topics", TopicController.getTopics);
-routes.delete("/topics", TopicController.deleteTopic);
-routes.put("/topics", TopicController.updateTopic);
+routes.post("/topics", verifyToken, TopicController.createNewTopic);
+routes.get("/topics", verifyToken, TopicController.getTopics);
+routes.delete("/topics", verifyToken, TopicController.deleteTopic);
+routes.put("/topics", verifyToken, TopicController.updateTopic);
 
 //Questions
 routes.get(
 	"/questions/question-qs",
+	verifyToken,
 	QuestionController.getQuestionByQuestionSet
 );
 
 //Questions Set
 routes.get(
 	"/questions-set/question-topic",
+	verifyToken,
 	QuestionSetController.questionSetByTopic
 );
 
