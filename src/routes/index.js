@@ -8,6 +8,7 @@ const AuthController = require("./../controllers/AuthController");
 const TopicController = require("./../controllers/TopicController");
 const QuestionController = require("./../controllers/QuestionController");
 const QuestionSetController = require("./../controllers/QuestionSetController");
+const UserQuestionController = require("./../controllers/UserQuestionController");
 
 // Auth
 routes.get("/hasemail", AuthController.hasEmail);
@@ -42,6 +43,23 @@ routes.get(
 	"/questions-set/question-topic",
 	verifyToken,
 	QuestionSetController.questionSetByTopic
+);
+
+//UserQuestion
+routes.get(
+	"/user-question/getexam-by-usertopic",
+	verifyToken,
+	UserQuestionController.getInfoExam
+);
+routes.post(
+	"/user-question/create-user-question",
+	verifyToken,
+	UserQuestionController.createUserQustion
+);
+routes.put(
+	"/user-question/update-user-question",
+	verifyToken,
+	UserQuestionController.updateUserQustion
 );
 
 module.exports = routes;
