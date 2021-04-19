@@ -13,16 +13,8 @@ const routes = require("./src/routes/index");
 app.use(morgan("dev"));
 
 //Parser Body
-app.use(
-	bodyParser.urlencoded({
-		extended: false,
-	})
-);
-app.use(
-	bodyParser.json({
-		type: "application/json",
-	})
-);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ type: "application/json" }));
 
 app.use("/public/images", express.static("public/images"));
 
