@@ -61,5 +61,15 @@ routes.put(
 	verifyToken,
 	UserQuestionController.updateUserQustion
 );
+routes.get(
+	"/user-question/rate-users",
+	verifyToken,
+	UserQuestionController.getRateUser
+);
+routes.get(
+	"/user-question/percent-topics",
+	verifyToken,
+	UserQuestionController.getPercentTopic
+);
 
 module.exports = routes;

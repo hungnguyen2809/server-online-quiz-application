@@ -57,6 +57,41 @@ class UserQuestionModel {
 			}
 		});
 	};
+
+	getRateUser = () => {
+		return new Promise((resolve, reject) => {
+			try {
+				const sql = "CALL GET_RATE_USER();";
+				connectDB.query(sql, (err, res) => {
+					if (err === null) {
+						resolve({ data: res[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	};
+
+	getPercentTopic = (id_user) => {
+		return new Promise((resolve, reject) => {
+			try {
+				const sql = "CALL GET_PERCENT_TOPIC(?);";
+				const values = [id_user];
+				connectDB.query(sql, values, (err, res) => {
+					if (err === null) {
+						resolve({ data: res[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	};
 }
 
 module.exports = new UserQuestionModel();

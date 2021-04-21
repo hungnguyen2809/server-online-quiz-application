@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.SV_PORT;
 const HOST = process.env.SV_HOST;
 
-const routes = require("./src/routes/index");
+const routes = require("./src/routes");
 
 // HTTP Logger
 app.use(morgan("dev"));
