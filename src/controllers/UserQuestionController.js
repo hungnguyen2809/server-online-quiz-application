@@ -1,4 +1,5 @@
-const UserQuestionModal = require("./../models/UserQuestionModel");
+const UserQuestionModel = require("./../models/UserQuestionModel");
+const QuestionSetModel = require("./../models/QuestionSetModel");
 const _ = require("lodash");
 const resServe = require("./../common/resultServe");
 const configPath = require("../common/configPathImage");
@@ -15,11 +16,40 @@ class UserQuestionController {
 					resServe.error("Bad request. Validate 'id_user' or 'id_topic'.")
 				);
 			}
-			const infoExam = await UserQuestionModal.getInfoExamByUserTopic(
+			const questionSets = await QuestionSetModel.getQuetionSetByTopic(
+				id_topic
+			);
+			const mapQS = _.map(questionSets.data, (item) => {
+				return {
+					id_qs: item.id,
+					id_topic: item.id_topic,
+					description: item.description,
+					level: item.level,
+					total_question: item.total_question,
+				};
+			});
+			const infoExam = await UserQuestionModel.getInfoExamByUserTopic(
 				id_user,
 				id_topic
 			);
-			return res.send(resServe.success("Success", _.get(infoExam, "data")));
+
+			let dataResult = [];
+			if (_.isEmpty(infoExam.data)) {
+				dataResult = mapQS;
+			} else {
+				dataResult = _.map(mapQS, (item) => {
+					let indexInfo = _.findIndex(
+						infoExam.data,
+						(ie) => ie.id_qs === item.id_qs
+					);
+					if (indexInfo !== -1) {
+						return infoExam.data[indexInfo];
+					} else {
+						return item;
+					}
+				});
+			}
+			return res.send(resServe.success("Success", dataResult));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
@@ -46,7 +76,7 @@ class UserQuestionController {
 				time_finish,
 				number_qc,
 			};
-			const infoExam = await UserQuestionModal.insertUserQuestion(params);
+			const infoExam = await UserQuestionModel.insertUserQuestion(params);
 			return res.send(resServe.success("Success", _.get(infoExam, "data")));
 		} catch (ex) {
 			if (ex.error) {
@@ -74,7 +104,7 @@ class UserQuestionController {
 				time_finish,
 				number_qc,
 			};
-			const infoExam = await UserQuestionModal.updateUserQuestion(params);
+			const infoExam = await UserQuestionModel.updateUserQuestion(params);
 			return res.send(resServe.success("Success", _.get(infoExam, "data")));
 		} catch (ex) {
 			if (ex.error) {
@@ -87,7 +117,7 @@ class UserQuestionController {
 
 	getRateUser = async (req, res) => {
 		try {
-			const rate = await UserQuestionModal.getRateUser();
+			const rate = await UserQuestionModel.getRateUser();
 			const rateUsers = _.map(_.get(rate, "data", []), (item) => {
 				return {
 					...item,
@@ -112,7 +142,7 @@ class UserQuestionController {
 				return res.send(resServe.error("Bad request. Validate 'id_user'."));
 			}
 
-			const percentTopics = await UserQuestionModal.getPercentTopic(id_user);
+			const percentTopics = await UserQuestionModel.getPercentTopic(id_user);
 			return res.send(resServe.success("Success", percentTopics.data));
 		} catch (ex) {
 			if (ex.error) {
