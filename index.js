@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-// const morgan = require("morgan");
+const morgan = require("morgan");
 require("dotenv").config();
 
 const app = express();
@@ -10,7 +10,7 @@ const PORT = process.env.PORT || process.env.SV_PORT;
 const routes = require("./src/routes");
 
 // HTTP Logger
-// app.use(morgan("dev"));
+app.use(morgan("dev"));
 
 //Parser Body
 app.use(bodyParser.urlencoded({ extended: false }));
