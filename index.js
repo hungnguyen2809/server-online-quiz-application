@@ -4,8 +4,8 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.SV_PORT;
-const HOST = process.env.SV_HOST;
+const PORT = process.env.PORT || process.env.SV_PORT;
+// const HOST = process.env.SV_HOST;
 
 const routes = require("./src/routes");
 
@@ -28,5 +28,5 @@ app.get("/", (req, res) => {
 app.use("/api", routes);
 
 app.listen(PORT, () => {
-	console.log(`Server listening at http://${HOST}:${PORT}`);
+	console.log(`Server listening at port:${PORT}`);
 });
