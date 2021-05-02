@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const morgan = require("morgan");
+// const morgan = require("morgan");
 require("dotenv").config();
 
 const app = express();
@@ -10,7 +10,7 @@ const { HOST_PORT } = require("./src/constants");
 const routes = require("./src/routes");
 
 // HTTP Logger
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 //Parser Body
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,7 +29,5 @@ app.get("/", (req, res) => {
 app.use("/api", routes);
 
 app.listen(HOST_PORT.PORT, () => {
-	console.log(
-		`Server is runing at host:${HOST_PORT.HOST}, port:${HOST_PORT.PORT}`
-	);
+	console.log(`Server is runing at ${HOST_PORT.BaseURL}`);
 });
