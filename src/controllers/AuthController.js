@@ -4,7 +4,7 @@ const UserModel = require("./../models/UserModel");
 const resultServe = require("./../common/resultServe");
 const configPath = require("../common/configPathImage");
 const _ = require("lodash");
-const { KEY_HEADER_TOKEN } = require("../constants/KeyHeader");
+const { KEY_HEADER_TOKEN } = require("../constants");
 
 class AuthController {
 	constructor() {}

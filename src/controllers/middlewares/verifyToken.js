@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { KEY_HEADER_TOKEN } = require("../../constants/KeyHeader");
+const { KEY_HEADER_TOKEN } = require("../../constants");
 require("dotenv");
 
 const verifyToken = (request, response, next) => {
