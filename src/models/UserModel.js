@@ -59,8 +59,8 @@ class UserModel {
 
 	create(user) {
 		return new Promise((resolve, reject) => {
-			// (name, email, token, image, phone, birtday, address, permission, status)
-			const sql = `INSERT INTO ${TABLE_NAME} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+			// const sql = `INSERT INTO ${TABLE_NAME} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+			const sql = "CALL REGISTER_USER(?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			let permission = 0;
 			let status = 1;
 			const values = [
@@ -76,15 +76,23 @@ class UserModel {
 			];
 
 			try {
+				// connectDB.query(sql, values, (err, res) => {
+				// 	const id = res.insertId;
+				// 	connectDB.query(
+				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
+				// 		[id],
+				// 		(error, results) => {
+				// 			resolve({ results });
+				// 		}
+				// 	);
+				// });
 				connectDB.query(sql, values, (err, res) => {
-					const id = res.insertId;
-					connectDB.query(
-						`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-						[id],
-						(error, results) => {
-							resolve({ results });
-						}
-					);
+					if (err === null) {
+						console.log(res);
+						resolve({ results: res[0] });
+					} else {
+						reject({ error: err });
+					}
 				});
 			} catch (error) {
 				reject({ error });
