@@ -88,7 +88,6 @@ class UserModel {
 				// });
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
-						console.log(res);
 						resolve({ results: res[0] });
 					} else {
 						reject({ error: err });
@@ -102,7 +101,8 @@ class UserModel {
 
 	updateInfo(user) {
 		return new Promise((resolve, reject) => {
-			const sql = `UPDATE ${TABLE_NAME} SET name = ?, phone = ?, birtday = ?, address = ? WHERE id = ?`;
+			// const sql = `UPDATE ${TABLE_NAME} SET name = ?, phone = ?, birtday = ?, address = ? WHERE id = ?`;
+			const sql = "CALL UPDATE_USER(?, ?, ?, ?, ?);";
 			const values = [
 				user.name,
 				user.phone,
@@ -111,14 +111,21 @@ class UserModel {
 				user.id,
 			];
 			try {
+				// connectDB.query(sql, values, (err, res) => {
+				// 	connectDB.query(
+				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
+				// 		[user.id],
+				// 		(error, results) => {
+				// 			resolve({ results });
+				// 		}
+				// 	);
+				// });
 				connectDB.query(sql, values, (err, res) => {
-					connectDB.query(
-						`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-						[user.id],
-						(error, results) => {
-							resolve({ results });
-						}
-					);
+					if (err === null) {
+						resolve({ results: res[0] });
+					} else {
+						reject({ error: err });
+					}
 				});
 			} catch (error) {
 				reject({ error });
@@ -128,17 +135,25 @@ class UserModel {
 
 	updateAvatar(id, image) {
 		return new Promise((resolve, reject) => {
-			const sql = `UPDATE ${TABLE_NAME} SET image = ? WHERE id = ?`;
+			// const sql = `UPDATE ${TABLE_NAME} SET image = ? WHERE id = ?`;
+			const sql = "CALL UPDATE_AVATAR_USER(?, ?);";
 			const values = [image, id];
 			try {
+				// connectDB.query(sql, values, (err, res) => {
+				// 	connectDB.query(
+				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
+				// 		[id],
+				// 		(error, results) => {
+				// 			resolve({ results });
+				// 		}
+				// 	);
+				// });
 				connectDB.query(sql, values, (err, res) => {
-					connectDB.query(
-						`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-						[id],
-						(error, results) => {
-							resolve({ results });
-						}
-					);
+					if (err === null) {
+						resolve({ results: res[0] });
+					} else {
+						reject({ error: err });
+					}
 				});
 			} catch (error) {
 				reject({ error });
@@ -148,17 +163,25 @@ class UserModel {
 
 	updatePassword(email, password) {
 		return new Promise((resolve, reject) => {
-			const sql = `UPDATE ${TABLE_NAME} SET password = ? WHERE email = ?`;
+			// const sql = `UPDATE ${TABLE_NAME} SET password = ? WHERE email = ?`;
+			const sql = "CALL UPDATE_PASSWORD_USER(?, ?);";
 			const values = [password, email];
 			try {
+				// connectDB.query(sql, values, (err, res) => {
+				// 	connectDB.query(
+				// 		`SELECT * FROM ${TABLE_NAME} WHERE email = ?`,
+				// 		[email],
+				// 		(error, results) => {
+				// 			resolve({ data: results[0] });
+				// 		}
+				// 	);
+				// });
 				connectDB.query(sql, values, (err, res) => {
-					connectDB.query(
-						`SELECT * FROM ${TABLE_NAME} WHERE email = ?`,
-						[email],
-						(error, results) => {
-							resolve({ data: results[0] });
-						}
-					);
+					if (err === null) {
+						resolve({ data: res[0][0] });
+					} else {
+						reject({ error: err });
+					}
 				});
 			} catch (error) {
 				reject({ error });
