@@ -12,4 +12,4 @@ const HOST_PORT = {
 		: `http://${process.env.SV_HOST_DEV}:${process.env.SV_PORT}`,
 };
 
-module.exports = { KEY_HEADER_TOKEN, HOST_PORT };
+module.exports = { KEY_HEADER_TOKEN, HOST_PORT, IS_PRODUCT };
