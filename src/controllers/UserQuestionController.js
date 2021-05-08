@@ -7,6 +7,10 @@ const configPath = require("../common/configPathImage");
 class UserQuestionController {
 	constructor() {}
 
+	undefined = (value) => {
+		return typeof value === "undefined";
+	};
+
 	getInfoExam = async (req, res) => {
 		try {
 			const { id_user, id_topic } = req.query;
@@ -62,7 +66,12 @@ class UserQuestionController {
 	createUserQustion = async (req, res) => {
 		try {
 			const { id_user, id_qs, time_finish, number_qc } = req.body;
-			if (!id_qs || !id_user || !time_finish || !number_qc) {
+			if (
+				this.undefined(id_qs) ||
+				this.undefined(id_user) ||
+				this.undefined(time_finish) ||
+				this.undefined(number_qc)
+			) {
 				res.statusCode = 400;
 				return res.send(
 					resServe.error(
@@ -90,7 +99,12 @@ class UserQuestionController {
 	updateUserQustion = async (req, res) => {
 		try {
 			const { id_user, id_qs, time_finish, number_qc } = req.body;
-			if (!id_qs || !id_user || !time_finish || !number_qc) {
+			if (
+				this.undefined(id_qs) ||
+				this.undefined(id_user) ||
+				this.undefined(time_finish) ||
+				this.undefined(number_qc)
+			) {
 				res.statusCode = 400;
 				return res.send(
 					resServe.error(
