@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const IS_PRODUCT = false;
+const IS_PRODUCT = true;
 
 const KEY_HEADER_TOKEN = "AuthToken-VTNH";
 
