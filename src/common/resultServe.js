@@ -1,14 +1,14 @@
-const success = (mes = "Success", payload = []) => {
+const success = (mes = null, payload = []) => {
 	return {
-		message: mes,
+		message: mes ? mes : "Thành công",
 		error: false,
 		payload,
 	};
 };
 
-const error = (mes = "Error by Serve", payload = []) => {
+const error = (mes = null, payload = []) => {
 	return {
-		message: mes,
+		message: mes ? mes : "Thất bại",
 		error: true,
 		payload,
 	};

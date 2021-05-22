@@ -2,6 +2,13 @@ const jwt = require("jsonwebtoken");
 const { KEY_HEADER_TOKEN } = require("../../constants");
 require("dotenv");
 
+const registerToken = (payload) => {
+	const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+		expiresIn: 60 * 60 * 24,
+	});
+	return token;
+};
+
 const verifyToken = (request, response, next) => {
 	const token = request.header(KEY_HEADER_TOKEN);
 
@@ -25,4 +32,4 @@ const verifyToken = (request, response, next) => {
 	}
 };
 
-module.exports = verifyToken;
+module.exports = { verifyToken, registerToken };

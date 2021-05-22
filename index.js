@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
@@ -15,6 +16,9 @@ app.use(morgan("dev"));
 //Parser Body
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: "application/json" }));
+
+//Accept CORS
+app.use(cors());
 
 // Public images
 app.use("/public/images", express.static("public/images"));
