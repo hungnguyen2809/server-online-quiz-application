@@ -136,9 +136,9 @@ class AuthController {
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
-				return res.send(resServe.error(sqlMessage));
+				return res.send(resultServe.error(sqlMessage));
 			}
-			return res.send(resServe.error());
+			return res.send(resultServe.error());
 		}
 	};
 
@@ -190,19 +190,32 @@ class AuthController {
 	getInfoDashbroad = async (req, res) => {
 		try {
 			const permission = 0; // 1 = admin, 0 user
-			const topics = await TopicModel.getTopics();
+			const topics = await TopicModel.getTopics(1);
 			const userNormal = await UserModel.getAllUserBy(permission);
 
 			const number_topic = _.size(topics.data);
+			const topic_active = _.size(
+				_.filter(topics.data, (item) => item.status === 1)
+			);
 			const number_user = _.size(userNormal.data);
+			const user_active = _.size(
+				_.filter(userNormal.data, (item) => item.status === 1)
+			);
 
-			return res.send(resultServe.success(null, { number_topic, number_user }));
+			return res.send(
+				resultServe.success(null, {
+					number_topic,
+					topic_active,
+					number_user,
+					user_active,
+				})
+			);
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
-				return res.send(resServe.error(sqlMessage));
+				return res.send(resultServe.error(sqlMessage));
 			}
-			return res.send(resServe.error());
+			return res.send(resultServe.error());
 		}
 	};
 }

@@ -183,6 +183,24 @@ class UserModel {
 			}
 		});
 	};
+
+	updateInfoUserAdmin = ({ id, email, password, status, per }) => {
+		return new Promise((resolve, reject) => {
+			try {
+				const sql = "CALL UPDATE_INFO_USER_ADMIN(?, ?, ?, ?, ?);";
+				const values = [id, email, password, status, per];
+				connectDB.query(sql, values, (err, res) => {
+					if (err === null) {
+						resolve({ data: res[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	};
 }
 
 module.exports = new UserModel();

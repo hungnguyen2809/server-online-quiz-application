@@ -9,6 +9,7 @@ const TopicController = require("./../controllers/TopicController");
 const QuestionController = require("./../controllers/QuestionController");
 const QuestionSetController = require("./../controllers/QuestionSetController");
 const UserQuestionController = require("./../controllers/UserQuestionController");
+const OtherController = require("./../controllers/OtherController");
 
 // Auth
 routes.get("/hasemail", AuthController.hasEmail);
@@ -16,6 +17,9 @@ routes.post("/userlogin", AuthController.login);
 routes.post("/adminlogin", AuthController.loginAdmin);
 routes.post("/userregister", AuthController.register);
 routes.post("/foget-password", UserController.forgetPassword);
+
+//Other
+routes.post("/upload-image", uploadImg, OtherController.upLoadImage);
 
 // DashBroad
 routes.get("/info-dashbroad", verifyToken, AuthController.getInfoDashbroad);
@@ -28,6 +32,8 @@ routes.post(
 	[verifyToken, uploadImg],
 	UserController.updateAvatar
 );
+routes.get("/users-all", verifyToken, UserController.getAllUserBy);
+routes.post("/users/update-info-admin", UserController.updateInfoUserAdmin);
 
 //Topics
 routes.post("/topics", verifyToken, TopicController.createNewTopic);

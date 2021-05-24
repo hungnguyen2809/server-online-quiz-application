@@ -3,6 +3,7 @@ const resultServe = require("./../common/resultServe");
 const format = require("./../common/formatDate");
 const configPath = require("./../common/configPathImage");
 const { toNumber } = require("lodash");
+const { checkUndefined } = require("./../common/methodServer");
 
 class UserController {
 	constructor() {}
@@ -58,7 +59,7 @@ class UserController {
 			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
 			res.statusCode = 500;
-			return res.send(resultServe.error());
+			return res.send(resultServe.error(error.message));
 		}
 	};
 
@@ -81,7 +82,7 @@ class UserController {
 			}
 		} catch (error) {
 			res.statusCode = 500;
-			return res.send(resultServe.error());
+			return res.send(resultServe.error(error.message));
 		}
 	};
 
@@ -97,7 +98,54 @@ class UserController {
 			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
 			res.statusCode = 500;
-			return res.send(resultServe.error());
+			return res.send(resultServe.error(error.message));
+		}
+	};
+
+	getAllUserBy = async (req, res) => {
+		try {
+			const per = typeof req.query.per === "undefined" ? 0 : 1;
+			const allUser = await UserModel.getAllUserBy(per);
+			return res.send(resultServe.success(null, allUser.data));
+		} catch (ex) {
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
+			return res.send(resultServe.error(ex.message));
+		}
+	};
+
+	updateInfoUserAdmin = async (req, res) => {
+		try {
+			const { id, email, password, status, per } = req.body;
+			if (
+				checkUndefined(id) ||
+				checkUndefined(email) ||
+				checkUndefined(password) ||
+				checkUndefined(status) ||
+				checkUndefined(per)
+			) {
+				res.statusCode = 400;
+				return res.send(resultServe.error("Bad request. Validate field."));
+			}
+			const params = { id, email, password, status, per };
+			const userUp = await UserModel.updateInfoUserAdmin(params);
+			let userObj = {};
+			if (userUp.data[0].image) {
+				userObj = {
+					...userUp.data[0],
+					image: configPath(userUp.data[0].image),
+				};
+			}
+			return res.send(resultServe.success(null, userObj));
+		} catch (ex) {
+			res.statusCode = 500;
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
+			return res.send(resultServe.error(ex.message));
 		}
 	};
 }

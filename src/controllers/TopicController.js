@@ -1,7 +1,8 @@
 const TopicModel = require("../models/TopicModel");
 const resServe = require("./../common/resultServe");
 const _ = require("lodash");
-const { get } = require("lodash");
+const { get, map } = require("lodash");
+const configPath = require("../common/configPathImage");
 
 class TopicController {
 	constructor() {}
@@ -11,8 +12,19 @@ class TopicController {
 
 	getTopics = async (req, res) => {
 		try {
-			const topics = await TopicModel.getTopics();
-			return res.send(resServe.success("Success", topics.data));
+			const permission = this._isUndefined(req.query.per) ? 0 : 1;
+			const topics = await TopicModel.getTopics(permission);
+			const mapTopic = map(topics.data, (item) => {
+				let image = null;
+				if (item.image) {
+					image = configPath(item.image);
+				}
+				return {
+					...item,
+					image,
+				};
+			});
+			return res.send(resServe.success("Success", mapTopic));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
@@ -39,7 +51,18 @@ class TopicController {
 			}
 			const payload = { name, image, description };
 			const topics = await TopicModel.createTopic(payload);
-			return res.send(resServe.success("Success", topics.data));
+			const mapTopic = map(topics.data, (item) => {
+				let image = null;
+				if (item.image) {
+					image = configPath(item.image);
+				}
+				return {
+					...item,
+					image,
+				};
+			});
+
+			return res.send(resServe.success("Success", mapTopic));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
@@ -92,14 +115,18 @@ class TopicController {
 
 			const payload = { id, name, image, description, status };
 			const topicUpdate = await TopicModel.updateTopic(payload);
+			const mapTopic = map(topicUpdate.data, (item) => {
+				let image = null;
+				if (item.image) {
+					image = configPath(item.image);
+				}
+				return {
+					...item,
+					image,
+				};
+			});
 
-			if (get(topicUpdate, "data") === false) {
-				return res.send(resServe.error("Topic not found"));
-			}
-
-			return res.send(
-				resServe.success("Update Success", get(topicUpdate, "data"))
-			);
+			return res.send(resServe.success("Update Success", mapTopic));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
