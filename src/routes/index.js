@@ -1,6 +1,6 @@
 const express = require("express");
 const routes = express.Router();
-const verifyToken = require("./../controllers/middlewares/verifyToken");
+const { verifyToken } = require("./../controllers/middlewares/verifyToken");
 const uploadImg = require("./../controllers/middlewares/uploadImage");
 
 const UserController = require("./../controllers/UserController");
@@ -9,12 +9,20 @@ const TopicController = require("./../controllers/TopicController");
 const QuestionController = require("./../controllers/QuestionController");
 const QuestionSetController = require("./../controllers/QuestionSetController");
 const UserQuestionController = require("./../controllers/UserQuestionController");
+const OtherController = require("./../controllers/OtherController");
 
 // Auth
 routes.get("/hasemail", AuthController.hasEmail);
 routes.post("/userlogin", AuthController.login);
+routes.post("/adminlogin", AuthController.loginAdmin);
 routes.post("/userregister", AuthController.register);
 routes.post("/foget-password", UserController.forgetPassword);
+
+//Other
+routes.post("/upload-image", uploadImg, OtherController.upLoadImage);
+
+// DashBroad
+routes.get("/info-dashbroad", verifyToken, AuthController.getInfoDashbroad);
 
 // User
 routes.get("/users", verifyToken, UserController.find);
@@ -24,6 +32,8 @@ routes.post(
 	[verifyToken, uploadImg],
 	UserController.updateAvatar
 );
+routes.get("/users-all", verifyToken, UserController.getAllUserBy);
+routes.post("/users/update-info-admin", UserController.updateInfoUserAdmin);
 
 //Topics
 routes.post("/topics", verifyToken, TopicController.createNewTopic);
@@ -37,12 +47,23 @@ routes.get(
 	verifyToken,
 	QuestionController.getQuestionByQuestionSet
 );
+routes.post("/questions/add-question", verifyToken, QuestionController.addQuestion);
 
 //Questions Set
 routes.get(
 	"/questions-set/question-topic",
 	verifyToken,
 	QuestionSetController.questionSetByTopic
+);
+routes.get(
+	"/questions-set/get-all",
+	verifyToken,
+	QuestionSetController.getAllQuestionSet
+);
+routes.post(
+	"/questions-set/create-update",
+	verifyToken,
+	QuestionSetController.createUpdateQuestionSet
 );
 
 //UserQuestion

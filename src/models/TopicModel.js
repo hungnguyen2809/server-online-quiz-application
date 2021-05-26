@@ -4,11 +4,12 @@ const _ = require("lodash");
 class TopicModel {
 	constructor() {}
 
-	getTopics = () => {
+	getTopics = (permission) => {
 		return new Promise((resolve, reject) => {
 			try {
-				const sql = "CALL TOPIC_GET_ALL();";
-				connectDB.query(sql, (err, res) => {
+				const sql = "CALL GET_ALL_TOPIC_ADMIN(?);";
+				const values = [permission];
+				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ data: res[0] });
 					} else {
@@ -73,21 +74,9 @@ class TopicModel {
 			try {
 				const sqlUpdate = "CALL TOPIC_UPDATE(?, ?, ?, ?, ?)";
 				const values = [id, name, image, description, status];
-
-				const sqlFind = "CALL TOPIC_FIND(?)";
-				connectDB.query(sqlFind, [id], (err, res) => {
+				connectDB.query(sqlUpdate, values, (err, res) => {
 					if (err === null) {
-						if (_.get(res[0][0], "NUMBER") > 0) {
-							connectDB.query(sqlUpdate, values, (err, res) => {
-								if (err === null) {
-									resolve({ data: res[0][0] });
-								} else {
-									reject({ error: err });
-								}
-							});
-						} else {
-							resolve({ data: false });
-						}
+						resolve({ data: res[0] });
 					} else {
 						reject({ error: err });
 					}

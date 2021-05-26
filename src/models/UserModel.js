@@ -57,9 +57,26 @@ class UserModel {
 		});
 	}
 
+	loginAdmin(email, password) {
+		return new Promise((resolve, reject) => {
+			const sql = "CALL LOGIN_ADMIN(?, ?)";
+			const values = [email, password];
+			try {
+				connectDB.query(sql, values, (err, results) => {
+					if (err === null) {
+						resolve({ data: results[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	}
+
 	create(user) {
 		return new Promise((resolve, reject) => {
-			// const sql = `INSERT INTO ${TABLE_NAME} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 			const sql = "CALL REGISTER_USER(?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			let permission = 0;
 			let status = 1;
@@ -76,16 +93,6 @@ class UserModel {
 			];
 
 			try {
-				// connectDB.query(sql, values, (err, res) => {
-				// 	const id = res.insertId;
-				// 	connectDB.query(
-				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-				// 		[id],
-				// 		(error, results) => {
-				// 			resolve({ results });
-				// 		}
-				// 	);
-				// });
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ results: res[0] });
@@ -101,7 +108,6 @@ class UserModel {
 
 	updateInfo(user) {
 		return new Promise((resolve, reject) => {
-			// const sql = `UPDATE ${TABLE_NAME} SET name = ?, phone = ?, birtday = ?, address = ? WHERE id = ?`;
 			const sql = "CALL UPDATE_USER(?, ?, ?, ?, ?);";
 			const values = [
 				user.name,
@@ -111,15 +117,6 @@ class UserModel {
 				user.id,
 			];
 			try {
-				// connectDB.query(sql, values, (err, res) => {
-				// 	connectDB.query(
-				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-				// 		[user.id],
-				// 		(error, results) => {
-				// 			resolve({ results });
-				// 		}
-				// 	);
-				// });
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ results: res[0] });
@@ -135,19 +132,9 @@ class UserModel {
 
 	updateAvatar(id, image) {
 		return new Promise((resolve, reject) => {
-			// const sql = `UPDATE ${TABLE_NAME} SET image = ? WHERE id = ?`;
 			const sql = "CALL UPDATE_AVATAR_USER(?, ?);";
 			const values = [image, id];
 			try {
-				// connectDB.query(sql, values, (err, res) => {
-				// 	connectDB.query(
-				// 		`SELECT * FROM ${TABLE_NAME} WHERE id = ?`,
-				// 		[id],
-				// 		(error, results) => {
-				// 			resolve({ results });
-				// 		}
-				// 	);
-				// });
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ results: res[0] });
@@ -163,19 +150,9 @@ class UserModel {
 
 	updatePassword(email, password) {
 		return new Promise((resolve, reject) => {
-			// const sql = `UPDATE ${TABLE_NAME} SET password = ? WHERE email = ?`;
 			const sql = "CALL UPDATE_PASSWORD_USER(?, ?);";
 			const values = [password, email];
 			try {
-				// connectDB.query(sql, values, (err, res) => {
-				// 	connectDB.query(
-				// 		`SELECT * FROM ${TABLE_NAME} WHERE email = ?`,
-				// 		[email],
-				// 		(error, results) => {
-				// 			resolve({ data: results[0] });
-				// 		}
-				// 	);
-				// });
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ data: res[0][0] });
@@ -188,6 +165,42 @@ class UserModel {
 			}
 		});
 	}
+
+	getAllUserBy = (permission) => {
+		return new Promise((resolve, reject) => {
+			const sql = "CALL GET_ALL_USER_BY(?)";
+			const values = [permission];
+			try {
+				connectDB.query(sql, values, (err, res) => {
+					if (err === null) {
+						resolve({ data: res[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	};
+
+	updateInfoUserAdmin = ({ id, email, password, status, per }) => {
+		return new Promise((resolve, reject) => {
+			try {
+				const sql = "CALL UPDATE_INFO_USER_ADMIN(?, ?, ?, ?, ?);";
+				const values = [id, email, password, status, per];
+				connectDB.query(sql, values, (err, res) => {
+					if (err === null) {
+						resolve({ data: res[0] });
+					} else {
+						reject({ error: err });
+					}
+				});
+			} catch (error) {
+				reject({ error });
+			}
+		});
+	};
 }
 
 module.exports = new UserModel();
