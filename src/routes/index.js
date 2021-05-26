@@ -47,12 +47,23 @@ routes.get(
 	verifyToken,
 	QuestionController.getQuestionByQuestionSet
 );
+routes.post("/questions/add-question", verifyToken, QuestionController.addQuestion);
 
 //Questions Set
 routes.get(
 	"/questions-set/question-topic",
 	verifyToken,
 	QuestionSetController.questionSetByTopic
+);
+routes.get(
+	"/questions-set/get-all",
+	verifyToken,
+	QuestionSetController.getAllQuestionSet
+);
+routes.post(
+	"/questions-set/create-update",
+	verifyToken,
+	QuestionSetController.createUpdateQuestionSet
 );
 
 //UserQuestion
