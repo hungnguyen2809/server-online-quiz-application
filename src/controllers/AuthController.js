@@ -1,7 +1,5 @@
-const jwt = require("jsonwebtoken");
-require("dotenv");
 const { KEY_HEADER_TOKEN } = require("../constants");
-const configPath = require("../common/configPathImage");
+// const configPath = require("../common/configPathImage");
 const resultServe = require("./../common/resultServe");
 const _ = require("lodash");
 const UserModel = require("./../models/UserModel");
@@ -13,7 +11,6 @@ class AuthController {
 
 	hasEmail = async (req, res) => {
 		const { email } = req.query;
-		// console.log(email);
 		try {
 			const hasEmail = await UserModel.hasEmail(email);
 			if (hasEmail.results) {
@@ -56,7 +53,6 @@ class AuthController {
 				let mes = "The account is locked, unavailable.";
 				return res.send(resultServe.error(mes));
 			}
-			// return res.send(resultServe.success("Success", user.results[0]));
 			const payload = {
 				email: _.get(userLogin.results[0], "email", ""),
 				name: _.get(userLogin.results[0], "name", ""),
@@ -65,18 +61,15 @@ class AuthController {
 				admin: _.get(userLogin.results[0], "permission", 0) === 1,
 			};
 
-			// const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-			// 	expiresIn: 60 * 60 * 24,
-			// });
 			const token = registerToken(payload);
 
 			let user = {
 				...userLogin.results[0],
 				token: token,
 			};
-			if (user.image) {
-				user.image = configPath(user.image);
-			}
+			// if (user.image) {
+			// 	user.image = configPath(user.image);
+			// }
 
 			return res
 				.header(KEY_HEADER_TOKEN, token)
@@ -106,10 +99,10 @@ class AuthController {
 				);
 			}
 
-			let pathImage = null;
-			if (_.get(adminLogin.data[0], "image", null)) {
-				pathImage = configPath(_.get(adminLogin.data[0], "image"));
-			}
+			// let pathImage = null;
+			// if (_.get(adminLogin.data[0], "image", null)) {
+			// 	pathImage = configPath(_.get(adminLogin.data[0], "image"));
+			// }
 
 			const payload = {
 				id: _.get(adminLogin.data[0], "id", -1),
@@ -118,7 +111,8 @@ class AuthController {
 				phone: _.get(adminLogin.data[0], "phone", ""),
 				address: _.get(adminLogin.data[0], "address", ""),
 				admin: _.get(adminLogin.data[0], "permission", 0) === 1,
-				image: pathImage,
+				// image: pathImage,
+				image: _.get(adminLogin.data[0], "image", ""),
 			};
 
 			const token = registerToken(payload);
@@ -126,9 +120,9 @@ class AuthController {
 				...adminLogin.data[0],
 				token: token,
 			};
-			if (user.image) {
-				user.image = configPath(user.image);
-			}
+			// if (user.image) {
+			// 	user.image = configPath(user.image);
+			// }
 
 			return res
 				.header(KEY_HEADER_TOKEN, token)
@@ -161,7 +155,6 @@ class AuthController {
 			// success
 			const user = await UserModel.create(body);
 			res.statusCode = 201;
-			// return res.send(resultServe.success("Create Success", user.results[0]));
 			const payload = {
 				email: _.get(user.results[0], "email", ""),
 				name: _.get(user.results[0], "name", ""),
@@ -170,9 +163,6 @@ class AuthController {
 				admin: _.get(user.results[0], "permission", 0) === 1,
 			};
 
-			// const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-			// 	expiresIn: 60 * 60 * 24,
-			// });
 			const token = registerToken(payload);
 
 			return res.header(KEY_HEADER_TOKEN, token).send(

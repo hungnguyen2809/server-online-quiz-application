@@ -1,7 +1,7 @@
 const UserModel = require("./../models/UserModel");
 const resultServe = require("./../common/resultServe");
 const format = require("./../common/formatDate");
-const configPath = require("./../common/configPathImage");
+// const configPath = require("./../common/configPathImage");
 const { toNumber } = require("lodash");
 const { checkUndefined } = require("./../common/methodServer");
 
@@ -19,9 +19,9 @@ class UserController {
 			}
 
 			let user = userFinding.results[0];
-			if (user.image) {
-				user.image = configPath(user.image);
-			}
+			// if (user.image) {
+			// 	user.image = configPath(user.image);
+			// }
 
 			return res.send(resultServe.success("Success", user));
 		} catch (error) {
@@ -52,9 +52,9 @@ class UserController {
 
 			const userUpdating = await UserModel.updateInfo(newUser);
 			let user = userUpdating.results[0];
-			if (user.image) {
-				user.image = configPath(user.image);
-			}
+			// if (user.image) {
+			// 	user.image = configPath(user.image);
+			// }
 
 			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
@@ -65,24 +65,34 @@ class UserController {
 
 	updateAvatar = async (req, res) => {
 		try {
-			if (req.file) {
-				const id = toNumber(req.body.id);
-				const image = req.file.path;
+			// if (req.file) {
+			// 	const id = toNumber(req.body.id);
+			// 	const image = req.file.path;
 
-				const userUpdating = await UserModel.updateAvatar(id, image);
-				let user = userUpdating.results[0];
-				if (user.image) {
-					user.image = configPath(user.image);
-				}
+			// 	const userUpdating = await UserModel.updateAvatar(id, image);
+			// 	let user = userUpdating.results[0];
+			// 	if (user.image) {
+			// 		user.image = configPath(user.image);
+			// 	}
 
-				return res.send(resultServe.success("Updated Success", user));
-			} else {
-				res.statusCode = 500;
-				return res.send(resultServe.error("Error by file"));
+			// 	return res.send(resultServe.success("Updated Success", user));
+			// } else {
+			// 	res.statusCode = 500;
+			// 	return res.send(resultServe.error("Error by file"));
+			// }
+			const { id, imageUrl } = req.body;
+			if (!id || !imageUrl) {
+				return res.send(resultServe.error("Invalie id and image"));
 			}
-		} catch (error) {
-			res.statusCode = 500;
-			return res.send(resultServe.error(error.message));
+
+			const userUpdating = await UserModel.updateAvatar(id, imageUrl);
+			return res.send(resultServe.success(null, userUpdating.results[0]));
+		} catch (ex) {
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
+			return res.send(resultServe.error(ex.message));
 		}
 	};
 
@@ -92,9 +102,9 @@ class UserController {
 			const userUpdate = await UserModel.updatePassword(email, password);
 
 			let user = userUpdate.data;
-			if (user.image) {
-				user.image = configPath(user.image);
-			}
+			// if (user.image) {
+			// 	user.image = configPath(user.image);
+			// }
 			return res.send(resultServe.success("Updated Success", user));
 		} catch (error) {
 			res.statusCode = 500;
@@ -131,14 +141,14 @@ class UserController {
 			}
 			const params = { id, email, password, status, per };
 			const userUp = await UserModel.updateInfoUserAdmin(params);
-			let userObj = {};
-			if (userUp.data[0].image) {
-				userObj = {
-					...userUp.data[0],
-					image: configPath(userUp.data[0].image),
-				};
-			}
-			return res.send(resultServe.success(null, userObj));
+			// let userObj = {};
+			// if (userUp.data[0].image) {
+			// 	userObj = {
+			// 		...userUp.data[0],
+			// 		image: configPath(userUp.data[0].image),
+			// 	};
+			// }
+			return res.send(resultServe.success(null, userUp.data[0]));
 		} catch (ex) {
 			res.statusCode = 500;
 			if (ex.error) {

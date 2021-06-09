@@ -10,6 +10,7 @@ const QuestionController = require("./../controllers/QuestionController");
 const QuestionSetController = require("./../controllers/QuestionSetController");
 const UserQuestionController = require("./../controllers/UserQuestionController");
 const OtherController = require("./../controllers/OtherController");
+const PostController = require("../controllers/PostController");
 
 // Auth
 routes.get("/hasemail", AuthController.hasEmail);
@@ -27,13 +28,18 @@ routes.get("/info-dashbroad", verifyToken, AuthController.getInfoDashbroad);
 // User
 routes.get("/users", verifyToken, UserController.find);
 routes.post("/users-infor", verifyToken, UserController.updateInfo);
-routes.post(
-	"/users-avatar",
-	[verifyToken, uploadImg],
-	UserController.updateAvatar
-);
+// routes.post(
+// 	"/users-avatar",
+// 	[verifyToken, uploadImg],
+// 	UserController.updateAvatar
+// );
+routes.post("/users-avatar", [verifyToken], UserController.updateAvatar);
 routes.get("/users-all", verifyToken, UserController.getAllUserBy);
-routes.post("/users/update-info-admin", UserController.updateInfoUserAdmin);
+routes.post(
+	"/users/update-info-admin",
+	[verifyToken],
+	UserController.updateInfoUserAdmin
+);
 
 //Topics
 routes.post("/topics", verifyToken, TopicController.createNewTopic);
@@ -47,7 +53,11 @@ routes.get(
 	verifyToken,
 	QuestionController.getQuestionByQuestionSet
 );
-routes.post("/questions/add-question", verifyToken, QuestionController.addQuestion);
+routes.post(
+	"/questions/add-question",
+	verifyToken,
+	QuestionController.addQuestion
+);
 
 //Questions Set
 routes.get(
@@ -91,6 +101,29 @@ routes.get(
 	"/user-question/percent-topics",
 	verifyToken,
 	UserQuestionController.getPercentTopic
+);
+
+//Post
+routes.get("/post/get-all", verifyToken, PostController.getAllPost);
+routes.get("/post/get-post-id", verifyToken, PostController.getPostByID);
+routes.post("/post/create-post", verifyToken, PostController.createNewPost);
+routes.post("/post/update-post", verifyToken, PostController.updatePost);
+
+//Post Comment
+routes.post(
+	"/post-cmt/create-post-cmt",
+	verifyToken,
+	PostController.createPostComment
+);
+routes.get(
+	"/post-cmt/get-comment",
+	verifyToken,
+	PostController.getPostCommentByID
+);
+routes.post(
+	"/post-cmt/update-post-cmt",
+	verifyToken,
+	PostController.updatePostComment
 );
 
 module.exports = routes;

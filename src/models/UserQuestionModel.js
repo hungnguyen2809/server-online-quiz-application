@@ -1,5 +1,4 @@
 const connectDB = require("../database/config");
-const _ = require("lodash");
 
 class UserQuestionModel {
 	constructor() {}
