@@ -5,7 +5,6 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const { HOST_PORT } = require("./src/constants");
 
 // Routes
 const routes = require("./src/routes");
@@ -32,6 +31,6 @@ app.get("/", (req, res) => {
 
 app.use("/api", routes);
 
-app.listen(HOST_PORT.PORT, () => {
-	console.log(`Server is runing at ${HOST_PORT.BaseURL}`);
+app.listen(process.env.PORT || 8888, () => {
+	console.log(`Server is runing at port: ${process.env.PORT || 8888}`);
 });

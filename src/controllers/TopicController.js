@@ -1,8 +1,7 @@
 const TopicModel = require("../models/TopicModel");
 const resServe = require("./../common/resultServe");
-const _ = require("lodash");
 const { get, map, countBy } = require("lodash");
-const configPath = require("../common/configPathImage");
+// const configPath = require("../common/configPathImage");
 const QuestionSetModel = require("../models/QuestionSetModel");
 
 class TopicController {
@@ -24,9 +23,9 @@ class TopicController {
 				mapTopic = map(topics.data, (item) => {
 					let image = null;
 					let countDeThi = 0;
-					if (item.image) {
-						image = configPath(item.image);
-					}
+					// if (item.image) {
+					// 	image = configPath(item.image);
+					// }
 					if (countQS[`${item.id}`] !== undefined) {
 						countDeThi = countQS[`${item.id}`];
 					}
@@ -39,9 +38,9 @@ class TopicController {
 			} else {
 				mapTopic = map(topics.data, (item) => {
 					let image = null;
-					if (item.image) {
-						image = configPath(item.image);
-					}
+					// if (item.image) {
+					// 	image = configPath(item.image);
+					// }
 					return {
 						...item,
 						image,
@@ -55,7 +54,7 @@ class TopicController {
 				const { sqlMessage } = ex.error;
 				return res.send(resServe.error(sqlMessage));
 			}
-			return res.send(resServe.error());
+			return res.send(resServe.error(ex.message));
 		}
 	};
 
@@ -77,14 +76,15 @@ class TopicController {
 			const payload = { name, image, description };
 			const topics = await TopicModel.createTopic(payload);
 			const mapTopic = map(topics.data, (item) => {
-				let image = null;
-				if (item.image) {
-					image = configPath(item.image);
-				}
-				return {
-					...item,
-					image,
-				};
+				// let image = null;
+				// if (item.image) {
+				// 	image = configPath(item.image);
+				// }
+				// return {
+				// 	...item,
+				// 	image,
+				// };
+				return { ...item };
 			});
 
 			return res.send(resServe.success("Success", mapTopic));
@@ -107,7 +107,7 @@ class TopicController {
 			const payload = { id };
 			const topics = await TopicModel.deleteTopic(payload);
 
-			if (_.get(topics, "data") === false) {
+			if (get(topics, "data") === false) {
 				return res.send(resServe.error("Topic not exists."));
 			}
 			return res.send(resServe.success("Delete Success", topics.data));
@@ -141,14 +141,15 @@ class TopicController {
 			const payload = { id, name, image, description, status };
 			const topicUpdate = await TopicModel.updateTopic(payload);
 			const mapTopic = map(topicUpdate.data, (item) => {
-				let image = null;
-				if (item.image) {
-					image = configPath(item.image);
-				}
-				return {
-					...item,
-					image,
-				};
+				// let image = null;
+				// if (item.image) {
+				// 	image = configPath(item.image);
+				// }
+				// return {
+				// 	...item,
+				// 	image,
+				// };
+				return { ...item };
 			});
 
 			return res.send(resServe.success("Update Success", mapTopic));
