@@ -1,7 +1,6 @@
 const TopicModel = require("../models/TopicModel");
 const resServe = require("./../common/resultServe");
 const { get, map, countBy } = require("lodash");
-// const configPath = require("../common/configPathImage");
 const QuestionSetModel = require("../models/QuestionSetModel");
 
 class TopicController {
@@ -21,30 +20,18 @@ class TopicController {
 				const questionSet = await QuestionSetModel.getAllQuestionSet(params);
 				let countQS = countBy(questionSet.data, (item) => item.id_topic);
 				mapTopic = map(topics.data, (item) => {
-					let image = null;
 					let countDeThi = 0;
-					// if (item.image) {
-					// 	image = configPath(item.image);
-					// }
 					if (countQS[`${item.id}`] !== undefined) {
 						countDeThi = countQS[`${item.id}`];
 					}
 					return {
 						...item,
-						image,
 						countDeThi,
 					};
 				});
 			} else {
 				mapTopic = map(topics.data, (item) => {
-					let image = null;
-					// if (item.image) {
-					// 	image = configPath(item.image);
-					// }
-					return {
-						...item,
-						image,
-					};
+					return { ...item };
 				});
 			}
 
@@ -76,14 +63,6 @@ class TopicController {
 			const payload = { name, image, description };
 			const topics = await TopicModel.createTopic(payload);
 			const mapTopic = map(topics.data, (item) => {
-				// let image = null;
-				// if (item.image) {
-				// 	image = configPath(item.image);
-				// }
-				// return {
-				// 	...item,
-				// 	image,
-				// };
 				return { ...item };
 			});
 
@@ -141,14 +120,6 @@ class TopicController {
 			const payload = { id, name, image, description, status };
 			const topicUpdate = await TopicModel.updateTopic(payload);
 			const mapTopic = map(topicUpdate.data, (item) => {
-				// let image = null;
-				// if (item.image) {
-				// 	image = configPath(item.image);
-				// }
-				// return {
-				// 	...item,
-				// 	image,
-				// };
 				return { ...item };
 			});
 

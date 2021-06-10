@@ -1,5 +1,4 @@
 const { KEY_HEADER_TOKEN } = require("../constants");
-// const configPath = require("../common/configPathImage");
 const resultServe = require("./../common/resultServe");
 const _ = require("lodash");
 const UserModel = require("./../models/UserModel");
@@ -67,9 +66,6 @@ class AuthController {
 				...userLogin.results[0],
 				token: token,
 			};
-			// if (user.image) {
-			// 	user.image = configPath(user.image);
-			// }
 
 			return res
 				.header(KEY_HEADER_TOKEN, token)
@@ -99,11 +95,6 @@ class AuthController {
 				);
 			}
 
-			// let pathImage = null;
-			// if (_.get(adminLogin.data[0], "image", null)) {
-			// 	pathImage = configPath(_.get(adminLogin.data[0], "image"));
-			// }
-
 			const payload = {
 				id: _.get(adminLogin.data[0], "id", -1),
 				email: _.get(adminLogin.data[0], "email", ""),
@@ -111,7 +102,6 @@ class AuthController {
 				phone: _.get(adminLogin.data[0], "phone", ""),
 				address: _.get(adminLogin.data[0], "address", ""),
 				admin: _.get(adminLogin.data[0], "permission", 0) === 1,
-				// image: pathImage,
 				image: _.get(adminLogin.data[0], "image", ""),
 			};
 
@@ -120,9 +110,6 @@ class AuthController {
 				...adminLogin.data[0],
 				token: token,
 			};
-			// if (user.image) {
-			// 	user.image = configPath(user.image);
-			// }
 
 			return res
 				.header(KEY_HEADER_TOKEN, token)

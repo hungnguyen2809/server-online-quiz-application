@@ -2,7 +2,6 @@ const UserQuestionModel = require("./../models/UserQuestionModel");
 const QuestionSetModel = require("./../models/QuestionSetModel");
 const _ = require("lodash");
 const resServe = require("./../common/resultServe");
-// const configPath = require("../common/configPathImage");
 
 class UserQuestionController {
 	constructor() {}
@@ -133,10 +132,6 @@ class UserQuestionController {
 		try {
 			const rate = await UserQuestionModel.getRateUser();
 			const rateUsers = _.map(_.get(rate, "data", []), (item) => {
-				// return {
-				// 	...item,
-				// 	image: item.image ? configPath(item.image) : item.image,
-				// };
 				return { ...item };
 			});
 			return res.send(resServe.success("Success", rateUsers));
