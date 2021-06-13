@@ -4,13 +4,13 @@ class PostModal {
 	constructor() {}
 
 	getAllPost = (per) => {
-		return new Promise((resovle, reject) => {
+		return new Promise((resolve, reject) => {
 			try {
 				const sql = "CALL Get_All_Post(?);";
 				const values = [per];
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
-						resovle({ data: res[0] });
+						resolve({ data: res[0] });
 					} else {
 						reject({ error: err });
 					}
@@ -27,7 +27,7 @@ class PostModal {
 				const sql = "CALL Create_New_Post(?, ?, ?);";
 				const values = [id_user, content, image];
 				connectDB.query(sql, values, (err, res) => {
-					if (res === null) {
+					if (err === null) {
 						resolve({ data: res[0] });
 					} else {
 						reject({ error: err });

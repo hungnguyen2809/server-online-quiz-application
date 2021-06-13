@@ -22,26 +22,16 @@ class PostController {
 	};
 
 	createNewPost = async (req, res) => {
-		try {
-			const { id_user, content, image } = req.body;
-			if (!id_user || !content || checkUndefined(image)) {
-				return res.send(
-					resServer.error(
-						"Bad request, invalidate 'id_user', 'content', 'image'"
-					)
-				);
-			}
-
-			const payload = { id_user, content, image };
-			const post = await PostModal.createNewPost(payload);
-			return res.send(resServer.success(null, post.data));
-		} catch (ex) {
-			if (ex.error) {
-				const { sqlMessage } = ex.error;
-				return res.send(resServer.error(sqlMessage));
-			}
-			return res.send(resServer.error(ex.message));
+		const { id_user, content, image } = req.body;
+		if (!id_user || !content || checkUndefined(image)) {
+			return res.send(
+				resServer.error("Bad request, invalidate 'id_user', 'content', 'image'")
+			);
 		}
+
+		const payload = { id_user, content, image };
+		const post = await PostModal.createNewPost(payload);
+		return res.send(resServer.success(null, post.data));
 	};
 
 	getPostByID = async (req, res) => {
@@ -105,6 +95,10 @@ class PostController {
 					)
 				);
 			}
+
+			const params = { id_post, id_user, comment, image };
+			const post_cmt = await PostModal.createPostComment(params);
+			return res.send(resServer.success(null, post_cmt.data));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
