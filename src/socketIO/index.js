@@ -10,6 +10,8 @@ const {
 	SOCKET_SERVER_SEND_USER_FOCUS_POSTCOMMENT,
 	SOCKET_CLIENT_SEND_USER_UNFOCUS_POSTCOMMENT,
 	SOCKET_SERVER_SEND_USER_UNFOCUS_POSTCOMMENT,
+	SOCKET_CLIENT_SEND_NEW_POSTCOMMENT,
+	SOCKET_SERVER_SEND_NEW_POSTCOMMENT,
 } = require("./constant");
 
 io.on("connection", (socket) => {
@@ -53,6 +55,14 @@ io.on("connection", (socket) => {
 			socket.broadcast
 				.in(socket.nameRoomPost)
 				.emit(SOCKET_SERVER_SEND_USER_UNFOCUS_POSTCOMMENT);
+		}
+	});
+
+	socket.on(SOCKET_CLIENT_SEND_NEW_POSTCOMMENT, (data) => {
+		if (socket.nameRoomPost) {
+			socket.broadcast
+				.in(socket.nameRoomPost)
+				.emit(SOCKET_SERVER_SEND_NEW_POSTCOMMENT, data);
 		}
 	});
 });
