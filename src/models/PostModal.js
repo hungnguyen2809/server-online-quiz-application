@@ -3,11 +3,11 @@ const connectDB = require("../database/config");
 class PostModal {
 	constructor() {}
 
-	getAllPost = (per) => {
+	getAllPost = (per, offset) => {
 		return new Promise((resolve, reject) => {
 			try {
-				const sql = "CALL Get_All_Post(?);";
-				const values = [per];
+				const sql = "CALL Get_All_Post(?, ?);";
+				const values = [per, offset];
 				connectDB.query(sql, values, (err, res) => {
 					if (err === null) {
 						resolve({ data: res[0] });

@@ -8,9 +8,12 @@ class PostController {
 
 	getAllPost = async (req, res) => {
 		try {
-			const { per } = req.query;
+			const { per, offset } = req.query;
+			if (!offset) {
+				return res.send(resServer.error("Bad request, invalidate 'offset' "));
+			}
 			const permission = checkUndefined(per) ? 0 : per;
-			const posts = await PostModal.getAllPost(permission);
+			const posts = await PostModal.getAllPost(permission, toNumber(offset));
 			return res.send(resServer.success(null, posts.data));
 		} catch (ex) {
 			if (ex.error) {
