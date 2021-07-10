@@ -1,3 +1,4 @@
+const { findIndex, find } = require("lodash");
 const { Server } = require("socket.io");
 const io = new Server({ cors: { origin: "*" } });
 const {
@@ -12,13 +13,31 @@ const {
 	SOCKET_SERVER_SEND_USER_UNFOCUS_POSTCOMMENT,
 	SOCKET_CLIENT_SEND_NEW_POSTCOMMENT,
 	SOCKET_SERVER_SEND_NEW_POSTCOMMENT,
+	SOCKET_CLIENT_SEND_MEMBER_COMMENT_POST,
+	SOCKET_SERVER_SEND_MEMBER_COMMENT_POST,
 } = require("./constant");
 
+let clients = [];
+
 io.on("connection", (socket) => {
-	console.log("Co nguoi ket noi: ", socket.id);
+	// console.log("Co nguoi ket noi: ", socket.id);
 	socket.on(SOCKET_CLIENT_SEND_PROFILE, (data) => {
-		socket.user = JSON.parse(data);
-		// console.log("Người dùng hiện tại: ", socket.user.name);
+		socket.user = data;
+		const client = {
+			socket_id: socket.id,
+			...data,
+		};
+		clients.push(client);
+	});
+
+	socket.on("disconect", () => {
+		const idxClient = findIndex(
+			clients,
+			(item) => item.socket_id === socket.id
+		);
+		if (idxClient !== -1) {
+			clients.splice(idxClient, 1);
+		}
 	});
 
 	//POST
@@ -63,6 +82,18 @@ io.on("connection", (socket) => {
 			socket.broadcast
 				.in(socket.nameRoomPost)
 				.emit(SOCKET_SERVER_SEND_NEW_POSTCOMMENT, data);
+		}
+	});
+
+	socket.on(SOCKET_CLIENT_SEND_MEMBER_COMMENT_POST, (data) => {
+		const client = find(clients, (i) => i.id_user === data.id_user);
+		// console.log({ client });
+		// console.log({ clients });
+		// console.log({ data });
+		if (client) {
+			socket
+				.to(client.socket_id)
+				.emit(SOCKET_SERVER_SEND_MEMBER_COMMENT_POST, data);
 		}
 	});
 });
