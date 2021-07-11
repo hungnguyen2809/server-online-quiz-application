@@ -229,6 +229,23 @@ class AuthController {
 			return res.send(resultServe.error());
 		}
 	};
+
+	unregisterTokenRefresh = async (req, res) => {
+		try {
+			const { token } = req.body;
+			if (!token) {
+				return res.send(resultServe.error("Invalid key token"));
+			}
+			await AuthModal.unregisterTokenRefresh(token);
+			return res.send(resultServe.success());
+		} catch (ex) {
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
+			return res.send(resultServe.error());
+		}
+	};
 }
 
 module.exports = new AuthController();
