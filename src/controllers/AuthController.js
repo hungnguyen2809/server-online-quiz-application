@@ -1,9 +1,11 @@
-const { KEY_HEADER_TOKEN } = require("../constants");
 const resultServe = require("./../common/resultServe");
-const _ = require("lodash");
-const UserModel = require("./../models/UserModel");
-const TopicModel = require("../models/TopicModel");
-const { registerToken } = require("./middlewares/verifyToken");
+const {
+	registerToken,
+	registerRefreshToken,
+	verifyRefreshToken,
+} = require("./middlewares/verifyToken");
+const { get, size, isEmpty } = require("lodash");
+const AuthModal = require("../models/AuthModal");
 
 class AuthController {
 	constructor() {}
@@ -11,7 +13,7 @@ class AuthController {
 	hasEmail = async (req, res) => {
 		const { email } = req.query;
 		try {
-			const hasEmail = await UserModel.hasEmail(email);
+			const hasEmail = await AuthModal.hasEmail(email);
 			if (hasEmail.results) {
 				return res.send(
 					resultServe.success("Email exists", { exists: true, id: hasEmail.id })
@@ -26,7 +28,7 @@ class AuthController {
 		}
 	};
 
-	login = async (req, res) => {
+	loginUser = async (req, res) => {
 		const body = req.body;
 		if (!body.email || !body.password) {
 			res.statusCode = 400;
@@ -35,13 +37,13 @@ class AuthController {
 		}
 		try {
 			const { email, password } = body;
-			const hasEmail = await UserModel.hasEmail(email);
+			const hasEmail = await AuthModal.hasEmail(email);
 			if (!hasEmail.results) {
 				res.statusCode = 404;
 				let mes = "User not exists";
 				return res.send(resultServe.error(mes));
 			}
-			const userLogin = await UserModel.login(email, password);
+			const userLogin = await AuthModal.loginUser(email, password);
 			if (userLogin.results.length === 0) {
 				res.statusCode = 403;
 				let mes = "Incorrect account email or password";
@@ -53,25 +55,35 @@ class AuthController {
 				return res.send(resultServe.error(mes));
 			}
 			const payload = {
-				email: _.get(userLogin.results[0], "email", ""),
-				name: _.get(userLogin.results[0], "name", ""),
-				phone: _.get(userLogin.results[0], "phone", ""),
-				address: _.get(userLogin.results[0], "address", ""),
-				admin: _.get(userLogin.results[0], "permission", 0) === 1,
+				id: get(userLogin, "results.0.id", -1),
+				email: get(userLogin.results[0], "email", ""),
+				name: get(userLogin.results[0], "name", ""),
+				phone: get(userLogin.results[0], "phone", ""),
+				address: get(userLogin.results[0], "address", ""),
+				admin: get(userLogin.results[0], "permission", 0) === 1,
+				image: get(userLogin.results[0], "image", ""),
 			};
-
 			const token = registerToken(payload);
+			const tokenRefresh = registerRefreshToken(payload);
 
-			let user = {
-				...userLogin.results[0],
-				token: token,
+			await AuthModal.registerTokenRefresh(
+				tokenRefresh,
+				get(userLogin, "results.0.id", "")
+			);
+
+			const userResponse = {
+				userInfo: userLogin.results[0],
+				userToken: {
+					token: token,
+					tokenRefresh: tokenRefresh,
+				},
 			};
-
-			return res
-				.header(KEY_HEADER_TOKEN, token)
-				.send(resultServe.success("Success", user));
-		} catch (error) {
-			res.statusCode = 500;
+			return res.send(resultServe.success("Success", userResponse));
+		} catch (ex) {
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
 			return res.send(resultServe.error());
 		}
 	};
@@ -86,8 +98,8 @@ class AuthController {
 			}
 
 			const { email, password } = body;
-			const adminLogin = await UserModel.loginAdmin(email, password);
-			if (_.size(adminLogin.data) === 0) {
+			const adminLogin = await AuthModal.loginAdmin(email, password);
+			if (size(adminLogin.data) === 0) {
 				return res.send(
 					resultServe.error(
 						"Thông tin tài khoản hoặc mật khẩu không chính xác."
@@ -96,24 +108,30 @@ class AuthController {
 			}
 
 			const payload = {
-				id: _.get(adminLogin.data[0], "id", -1),
-				email: _.get(adminLogin.data[0], "email", ""),
-				name: _.get(adminLogin.data[0], "name", ""),
-				phone: _.get(adminLogin.data[0], "phone", ""),
-				address: _.get(adminLogin.data[0], "address", ""),
-				admin: _.get(adminLogin.data[0], "permission", 0) === 1,
-				image: _.get(adminLogin.data[0], "image", ""),
+				id: get(adminLogin.data[0], "id", -1),
+				email: get(adminLogin.data[0], "email", ""),
+				name: get(adminLogin.data[0], "name", ""),
+				phone: get(adminLogin.data[0], "phone", ""),
+				address: get(adminLogin.data[0], "address", ""),
+				admin: get(adminLogin.data[0], "permission", 0) === 1,
+				image: get(adminLogin.data[0], "image", ""),
 			};
-
 			const token = registerToken(payload);
-			let user = {
-				...adminLogin.data[0],
-				token: token,
-			};
+			const refreshToken = registerRefreshToken(payload);
 
-			return res
-				.header(KEY_HEADER_TOKEN, token)
-				.send(resultServe.success(null, user));
+			await AuthModal.registerTokenRefresh(
+				refreshToken,
+				get(adminLogin, "data.0.id", "")
+			);
+
+			const userResponse = {
+				userInfo: adminLogin.data[0],
+				userToken: {
+					token: token,
+					tokenRefresh: refreshToken,
+				},
+			};
+			return res.send(resultServe.success(null, userResponse));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
@@ -123,7 +141,7 @@ class AuthController {
 		}
 	};
 
-	register = async (req, res) => {
+	registerUser = async (req, res) => {
 		try {
 			// check requets
 			const body = req.body;
@@ -133,60 +151,76 @@ class AuthController {
 				return res.send(resultServe.error(mes, []));
 			}
 			// check email already exist
-			const hasUser = await UserModel.hasEmail(body.email);
+			const hasUser = await AuthModal.hasEmail(body.email);
 			if (hasUser.results) {
 				res.statusCode = 400;
 				let mes = "Email already exist.";
 				return res.send(resultServe.error(mes, []));
 			}
 			// success
-			const user = await UserModel.create(body);
+			const user = await AuthModal.registerUser(body);
 			res.statusCode = 201;
 			const payload = {
-				email: _.get(user.results[0], "email", ""),
-				name: _.get(user.results[0], "name", ""),
-				phone: _.get(user.results[0], "phone", ""),
-				address: _.get(user.results[0], "address", ""),
-				admin: _.get(user.results[0], "permission", 0) === 1,
+				id: get(user, "results.0.id", -1),
+				email: get(user.results[0], "email", ""),
+				name: get(user.results[0], "name", ""),
+				phone: get(user.results[0], "phone", ""),
+				address: get(user.results[0], "address", ""),
+				admin: get(user.results[0], "permission", 0) === 1,
+				image: get(user.results[0], "image", ""),
 			};
-
 			const token = registerToken(payload);
+			const tokenRefresh = registerRefreshToken(payload);
 
-			return res.header(KEY_HEADER_TOKEN, token).send(
-				resultServe.success("Created Success", {
-					...user.results[0],
-					token: token,
-				})
-			);
-		} catch (error) {
-			res.statusCode = 500;
-			return res.send(resultServe.error);
-		}
-	};
-
-	getInfoDashbroad = async (req, res) => {
-		try {
-			const permission = 0; // 1 = admin, 0 user
-			const topics = await TopicModel.getTopics(1);
-			const userNormal = await UserModel.getAllUserBy(permission);
-
-			const number_topic = _.size(topics.data);
-			const topic_active = _.size(
-				_.filter(topics.data, (item) => item.status === 1)
-			);
-			const number_user = _.size(userNormal.data);
-			const user_active = _.size(
-				_.filter(userNormal.data, (item) => item.status === 1)
+			await AuthModal.registerTokenRefresh(
+				tokenRefresh,
+				get(user, "results.0.id", "")
 			);
 
 			return res.send(
-				resultServe.success(null, {
-					number_topic,
-					topic_active,
-					number_user,
-					user_active,
+				resultServe.success("Created Success", {
+					userInfo: user.results[0],
+					userToken: {
+						token: token,
+						tokenRefresh,
+					},
 				})
 			);
+		} catch (ex) {
+			if (ex.error) {
+				const { sqlMessage } = ex.error;
+				return res.send(resultServe.error(sqlMessage));
+			}
+			return res.send(resultServe.error());
+		}
+	};
+
+	refreshToken = async (req, res) => {
+		try {
+			const { token, id_user } = req.body;
+			if (!token || !id_user) {
+				return res.send(resultServe.error("Invalid token, id_user"));
+			}
+			const tokenRefreshs = await AuthModal.findTokenRefresh(token);
+			if (isEmpty(tokenRefreshs.data)) {
+				return res
+					.status(403)
+					.send(resultServe.errorToken("Phiên đăng nhập không tồn tại"));
+			}
+			const tokenNew = verifyRefreshToken(token);
+			await AuthModal.unregisterTokenRefresh(token);
+			if (isEmpty(tokenNew)) {
+				return res
+					.status(403)
+					.send(resultServe.errorToken("Bạn không có quyền truy cập"));
+			}
+
+			await AuthModal.registerTokenRefresh(tokenNew.refreshToken, id_user);
+			const userToken = {
+				token: tokenNew.token,
+				tokenRefresh: tokenNew.refreshToken,
+			};
+			return res.send(resultServe.success(null, userToken));
 		} catch (ex) {
 			if (ex.error) {
 				const { sqlMessage } = ex.error;
