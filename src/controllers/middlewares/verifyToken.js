@@ -5,16 +5,14 @@ const { KEY_HEADER_TOKEN } = require("../../constants");
 
 const registerToken = (payload) => {
 	const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-		// expiresIn: 60 * 60 * 24,
-		expiresIn: 60,
+		expiresIn: 60 * 60 * 24,
 	});
 	return token;
 };
 
 const registerRefreshToken = (payload) => {
 	return jwt.sign(payload, process.env.TOKEN_SECRET_REFRESH, {
-		// expiresIn: 60 * 60 * 24 * 2,
-		expiresIn: 60 * 2,
+		expiresIn: 60 * 60 * 24 * 2,
 	});
 };
 
