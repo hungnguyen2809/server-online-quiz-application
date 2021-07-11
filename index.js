@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
@@ -10,8 +9,8 @@ const { io } = require("./src/socketIO");
 
 app.use(cors());
 app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({ type: "application/json" }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ type: "application/json" }));
 app.use("/public/images", express.static("public/images"));
 
 const server = require("http").createServer(app);

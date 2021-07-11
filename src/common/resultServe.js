@@ -14,7 +14,17 @@ const error = (mes = null, payload = []) => {
 	};
 };
 
+const errorToken = (mes = null) => {
+	return {
+		message: mes ? mes : "Access Denied",
+		token_invalid: true,
+		payload: null,
+		error: true,
+	};
+};
+
 module.exports = {
 	success,
 	error,
+	errorToken,
 };
