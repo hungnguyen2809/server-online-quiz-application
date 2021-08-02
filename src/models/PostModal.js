@@ -111,7 +111,7 @@ class PostModal {
 		});
 	};
 
-	updatePostComment = (id_post_cmt, comment, image, status) => {
+	updatePostComment = ({id_post_cmt, comment, image, status}) => {
 		return new Promise((resolve, reject) => {
 			try {
 				const sql = "CALL Update_Post_Comment(?, ?, ?, ?);";
