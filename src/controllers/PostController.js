@@ -133,7 +133,12 @@ class PostController {
 	updatePostComment = async (req, res) => {
 		try {
 			let { id_post_cmt, comment, image, status } = req.body;
-			if (!id_post_cmt || !comment || checkUndefined(image) || !status) {
+			if (
+				!id_post_cmt ||
+				checkUndefined(comment) ||
+				checkUndefined(image) ||
+				checkUndefined(status)
+			) {
 				return res.send(
 					resServer.error(
 						"Bad request, invalidate 'id_post_cmt', 'comment', 'image', 'status'"
